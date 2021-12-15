@@ -1,1 +1,2 @@
-# gameitsergeyilsaf
+создание игры для ит 
+
