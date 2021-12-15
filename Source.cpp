@@ -67,7 +67,7 @@ void update() {
 			objects[1].y = window_height - objects[1].width / 2;
 			onground = true;
 		}
-			
+
 		else {
 			objects[1].velocity.y = objects[1].velocity.y + g * t;
 			objects[1].y = objects[1].y + objects[1].velocity.y * t;
@@ -77,17 +77,24 @@ void update() {
 	else {
 		objects[1].y = objects[1].y;
 	}
-	if (Keyboard::isKeyPressed(Keyboard::Left) && objects[1].x > objects[1].height) {
+	if ((Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::A)) && objects[1].x > objects[1].height) {
 		player.setImage("banan.png");
 		objects[1].x -= objects[1].velocity.x;
 		objects[1].Move(objects[1].x - 1, objects[1].y);
 	}
-	if (Keyboard::isKeyPressed(Keyboard::Right) && objects[1].x < window_width - (objects[1].height)) {
+	if ((Keyboard::isKeyPressed(Keyboard::Right) || Keyboard::isKeyPressed(Keyboard::D)) && objects[1].x < window_width - (objects[1].height)) {
 		player.setImage("bananreverse.png");
 		objects[1].x += objects[1].velocity.x;
 		objects[1].Move(objects[1].x + 1, objects[1].y);
 	}
-	
+	if ((Keyboard::isKeyPressed(Keyboard::W)) && (onground))
+	{
+		objects[1].velocity.y = 1;
+		objects[1].y -= 100;
+		onground = false;
+	}
+	//if (!onground) { objects[1].y += 0.0015 * t; } 
+
 }
 
 int main()
@@ -101,27 +108,26 @@ int main()
 	objects[1].mass = 1;
 	objects[1].width = 50;
 	objects[1].height = 50;
-	float dx=0, dy=0;
-	objects[1].Move(objects[1].width , objects[1].height / 2);
+	float dx = 0, dy = 0;
+	objects[1].Move(objects[1].width, objects[1].height / 2);
 	while (window.isOpen())
 	{
-		
+
 		Event event;
 		Vector2i pixelpos = Mouse::getPosition(window);
-		cout << pixelpos.x << ' ' << pixelpos.y << endl;
 		while (window.pollEvent(event))
 		{
 			{
-				if (event.type == Event::Closed||event.key.code == Keyboard::Escape)
+				if (event.type == Event::Closed || event.key.code == Keyboard::Escape)
 					window.close();
 			}
 			if (event.type == Event::MouseButtonPressed) {
 				if (event.key.code == Mouse::Left) {
-					cout << "mouse" << endl;
-					if (objects[1].x == pixelpos.x && objects[1].y ==pixelpos.y) {
+					//cout << "mouse" << endl;
+					if (objects[1].x == pixelpos.x && objects[1].y == pixelpos.y) {
 						dx = pixelpos.x - objects[1].x;
 						dy = pixelpos.y - objects[1].y;
-						objects[1].moving=true;
+						objects[1].moving = true;
 					}
 				}
 			}
@@ -135,7 +141,7 @@ int main()
 			objects[1].y = pixelpos.y - dy;
 		}
 
-		
+
 		// call update every tick
 		update();
 		window.clear();
@@ -143,7 +149,7 @@ int main()
 		for (int i = 0; i < int(objects.size()); i++) {
 			window.draw(objects[i].image);
 		}
-		
+
 		window.display();
 	}
 	return 0;
