@@ -58,8 +58,8 @@ vector <Object> objects;
 Object sun("sun.png");
 Object player("banan.png");
 
-void update() {
-	int g = 10; float t = 0.007;
+void update(float time) {
+	int g = 10;
 	bool onground = false;
 	if (objects[1].mass != 0) {
 		if (objects[1].y >= window_height - objects[1].width / 2)
@@ -69,8 +69,8 @@ void update() {
 		}
 
 		else {
-			objects[1].velocity.y = objects[1].velocity.y + g * t;
-			objects[1].y = objects[1].y + objects[1].velocity.y * t;
+			objects[1].velocity.y = objects[1].velocity.y + g * time;
+			objects[1].y = objects[1].y + objects[1].velocity.y * time;
 			objects[1].Move(objects[1].x, objects[1].y);
 		}
 	}
@@ -93,7 +93,7 @@ void update() {
 		objects[1].y -= 100;
 		onground = false;
 	}
-	//if (!onground) { objects[1].y += 0.0015 * t; } 
+	//if (!onground) { objects[1].y += 0.0015 * time; } 
 
 }
 
@@ -105,51 +105,70 @@ int main()
 	// move sun to the center of the screen
 	objects[0].Move(window_width / 2, sun.height / 2);
 	objects.push_back(player);
+	bool isMove = false;//переменная для щелчка мыши по спрайту
 	objects[1].mass = 1;
+	Clock clock;
 	objects[1].width = 50;
 	objects[1].height = 50;
-	float dx = 0, dy = 0;
+	float dx = 0; //корректировка нажатия по х
+	float dy = 0; //по у
 	objects[1].Move(objects[1].width, objects[1].height / 2);
 	while (window.isOpen())
 	{
-
+		float time = clock.getElapsedTime().asMicroseconds();
+		clock.restart();
+		time = time / 80000;
+		Vector2i pixelPos = Mouse::getPosition(window);//забираем коорд курсора
+		Vector2f pos = window.mapPixelToCoords(pixelPos);//переводим их в игровые (уходим от коорд окна)
+		//std::cout << pixelPos.x << "\n";//смотрим на координату Х позиции курсора в консоли (она не будет больше ширины окна)
+		//std::cout << pos.x << "\n";//смотрим на Х,которая преобразовалась в мировые координаты
 		Event event;
-		Vector2i pixelpos = Mouse::getPosition(window);
 		while (window.pollEvent(event))
 		{
-			{
-				if (event.type == Event::Closed || event.key.code == Keyboard::Escape)
-					window.close();
-			}
-			if (event.type == Event::MouseButtonPressed) {
-				if (event.key.code == Mouse::Left) {
-					//cout << "mouse" << endl;
-					if (objects[1].x == pixelpos.x && objects[1].y == pixelpos.y) {
-						dx = pixelpos.x - objects[1].x;
-						dy = pixelpos.y - objects[1].y;
-						objects[1].moving = true;
+			if (event.type == Event::MouseButtonPressed)
+			{ //если нажата клавиша мыши
+				if (event.key.code == Mouse::Left)
+				{ //а именно левая
+					if (objects[1].x == pixelPos.x && objects[1].y == pixelPos.y)//и при этом координата курсора попадает в спрайт; objects[1].getGlobalBounds().contains(pos.x, pos.y)
+					{
+						//std::cout << "isClicked!\n";//выводим в консоль сообщение об этом
+						dx = pos.x - objects[1].x;//делаем разность между позицией курсора и спрайта.для корректировки нажатия; pos.x - objects[1].getPosition().x
+						dy = pos.y - objects[1].y;//тоже самое по игреку; pos.y - objects[1].getPosition().y
+						isMove = true;//можем двигать спрайт							
 					}
 				}
 			}
+			if (event.type == Event::Closed || event.key.code == Keyboard::Escape) window.close();			
+			/*if (event.type == Event::MouseButtonPressed) {
+				if (event.key.code == Mouse::Left) {
+					//cout << "mouse" << endl;
+					if (objects[1].x == pixelPos.x && objects[1].y == pixelPos.y) {
+						dx = pixelPos.x - objects[1].x;
+						dy = pixelPos.y - objects[1].y;
+						objects[1].moving = true;
+					}
+				}*/
 			if (event.type == Event::MouseButtonReleased)
+			{//если отпустили клавишу
 				if (event.key.code == Mouse::Left)
-					objects[1].moving = false;
-
+				{ //а именно левую
+					isMove = false; //то не можем двигать спрайт
+				}
+			}
+			if (isMove) {//если можем двигать				
+				objects[1].x = pos.x - dx;//двигаем спрайт по Х
+				objects[1].y = pos.y - dy;//двигаем по Y
+				//p.sprite.setPosition(pos.x - dX, pos.y - dY);//можно и так написать,если у вас нету х и у в классе игрока
+			}
 		}
-		if (objects[1].moving == true) {
-			objects[1].x = pixelpos.x - dx;
-			objects[1].y = pixelpos.y - dy;
-		}
-
-
 		// call update every tick
-		update();
+		update(time);
 		window.clear();
 		// draw all objects in vector
-		for (int i = 0; i < int(objects.size()); i++) {
+		for (int i = 0; i < int(objects.size()); i++) 
+		{
 			window.draw(objects[i].image);
 		}
-
 		window.display();
 	}
 	return 0;
