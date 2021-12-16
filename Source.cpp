@@ -53,6 +53,7 @@ public:
 
 int window_width = 1200;
 int window_height = 800;
+bool onground = false;
 vector <Object> objects;
 
 Object sun("sun.png");
@@ -60,7 +61,7 @@ Object player("banan.png");
 
 void update(float time) {
 	int g = 10;
-	bool onground = false;
+	//bool onground = false;
 	if (objects[1].mass != 0) {
 		if (objects[1].y >= window_height - objects[1].width / 2)
 		{
@@ -77,7 +78,7 @@ void update(float time) {
 	else {
 		objects[1].y = objects[1].y;
 	}
-	if ((Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::A)) && objects[1].x > objects[1].height) {
+	/*if ((Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::A)) && objects[1].x > objects[1].height) {
 		player.setImage("banan.png");
 		objects[1].x -= objects[1].velocity.x;
 		objects[1].Move(objects[1].x - 1, objects[1].y);
@@ -93,8 +94,7 @@ void update(float time) {
 		objects[1].y -= 100;
 		onground = false;
 	}
-	//if (!onground) { objects[1].y += 0.0015 * time; } 
-
+	if (!onground) { objects[1].y += 0.0015 * time; } */
 }
 
 int main()
@@ -125,7 +125,7 @@ int main()
 		Event event;
 		while (window.pollEvent(event))
 		{
-			if (event.type == Event::MouseButtonPressed)
+			if (event.type == Event::MouseButtonPressed) // 3 task
 			{ //если нажата клавиша мыши
 				if (event.key.code == Mouse::Left)
 				{ //а именно левая
@@ -138,7 +138,7 @@ int main()
 					}
 				}
 			}
-			if (event.type == Event::Closed || event.key.code == Keyboard::Escape) window.close();			
+			if (event.type == Event::Closed || event.key.code == Keyboard::Escape) window.close(); // 2 task 
 			/*if (event.type == Event::MouseButtonPressed) {
 				if (event.key.code == Mouse::Left) {
 					//cout << "mouse" << endl;
@@ -148,19 +148,38 @@ int main()
 						objects[1].moving = true;
 					}
 				}*/
-			if (event.type == Event::MouseButtonReleased)
+			
+			if (event.type == Event::MouseButtonReleased) // 3 task
 			{//если отпустили клавишу
 				if (event.key.code == Mouse::Left)
 				{ //а именно левую
 					isMove = false; //то не можем двигать спрайт
 				}
 			}
-			if (isMove) {//если можем двигать				
+			if (isMove) {//если можем двигать; 3 task
 				objects[1].x = pos.x - dx;//двигаем спрайт по Х
 				objects[1].y = pos.y - dy;//двигаем по Y
 				//p.sprite.setPosition(pos.x - dX, pos.y - dY);//можно и так написать,если у вас нету х и у в классе игрока
 			}
 		}
+		// 2 task
+		if ((Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::A)) && objects[1].x > objects[1].height) {
+			player.setImage("banan.png");
+			objects[1].x -= objects[1].velocity.x;
+			objects[1].Move(objects[1].x - 1, objects[1].y);
+		}
+		if ((Keyboard::isKeyPressed(Keyboard::Right) || Keyboard::isKeyPressed(Keyboard::D)) && objects[1].x < window_width - (objects[1].height)) {
+			player.setImage("bananreverse.png");
+			objects[1].x += objects[1].velocity.x;
+			objects[1].Move(objects[1].x + 1, objects[1].y);
+		}
+		if ((Keyboard::isKeyPressed(Keyboard::W)) && (onground))
+		{
+			objects[1].velocity.y = 1;
+			objects[1].y -= 100;
+			onground = false;
+		}
+		if (!onground) { objects[1].y += 0.0015 * time; }
 		// call update every tick
 		update(time);
 		window.clear();
