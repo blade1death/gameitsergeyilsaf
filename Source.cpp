@@ -54,18 +54,21 @@ public:
 int window_width = 1200;
 int window_height = 800;
 bool onground = false;
+bool gravitation = true;
+bool flagclose = false;
 vector <Object> objects;
 
 Object sun("sun.png");
 Object player("banan.png");
 
-void update(float time,bool &gravitation) {
+void update(float time) {
 	int g = 10;
 	if (gravitation == true) {
 		if (objects[1].mass != 0) {
-			if (objects[1].y >= window_height - objects[1].width / 2)
+			if (objects[1].y >= window_height - objects[1].height/4)
 			{
-				objects[1].y = window_height - objects[1].width / 2;
+				objects[1].y = window_height - objects[1].height/4;
+				onground = true;
 			}
 
 			else {
@@ -79,6 +82,7 @@ void update(float time,bool &gravitation) {
 		}
 	}
 
+
 }
 
 int main()
@@ -89,14 +93,8 @@ int main()
 	// move sun to the center of the screen
 	objects[0].Move(window_width / 2, sun.height / 2);
 	objects.push_back(player);
-	bool isMove = false;//переменная для щелчка мыши по спрайту
 	objects[1].mass = 1;
 	Clock clock;
-	objects[1].width = 50;
-	objects[1].height = 50;
-	bool gravitation = true;
-	float dx = 0; //корректировка нажатия по х
-	float dy = 0; //по у
 	objects[1].Move(objects[1].width, objects[1].height / 2);
 	while (window.isOpen())
 	{
@@ -107,21 +105,20 @@ int main()
 		Event event;
 		while (window.pollEvent(event))
 		{
-
 				if (Mouse::isButtonPressed(Mouse::Left))
 				{ //а именно левая
 					if (objects[1].image.getGlobalBounds().contains(pos.x, pos.y))
 					{
-						isMove = true;//можем двигать
+						objects[1].moving = true;//можем двигать
 						gravitation = false;
 					}
 				}
-			if (event.type == Event::Closed || event.key.code == Keyboard::Escape) window.close(); // 2 task 
+			if (event.type == Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape)) flagclose=true; // 2 task 
 			if (event.type == Event::MouseButtonReleased) // 3 task
 			{//если отпустили клавишу
 				if (event.key.code == Mouse::Left)
 				{ //а именно левую
-					isMove = false; //то не можем двигать 
+					objects[1].moving = false; //то не можем двигать 
 					gravitation = true;
 				}
 			}
@@ -136,23 +133,22 @@ int main()
 			}
 		}
 		// 2 task
-		if ((Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::A)) && objects[1].x > objects[1].height) {
+		if ((Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::A)) && objects[1].x > objects[1].width/2) {
 			player.setImage("banan.png");
 			objects[1].x -= objects[1].velocity.x;
 			objects[1].Move(objects[1].x - 1, objects[1].y);
 		}
-		if ((Keyboard::isKeyPressed(Keyboard::Right) || Keyboard::isKeyPressed(Keyboard::D)) && objects[1].x < window_width - (objects[1].height)) {
+		if ((Keyboard::isKeyPressed(Keyboard::Right) || Keyboard::isKeyPressed(Keyboard::D)) && objects[1].x < window_width - (objects[1].width/2)) {
 			player.setImage("bananreverse.png");
 			objects[1].x += objects[1].velocity.x;
 			objects[1].Move(objects[1].x + 1, objects[1].y);
 		}
-		if (!onground) { objects[1].y += 0.0015 * time; }
-		if (isMove) {//если можем двигать; 3 task
+		if (objects[1].moving) {//если можем двигать; 3 task
 			objects[1].x = pos.x;//двигаем  по Х
 			objects[1].y = pos.y ;//двигаем по Y
 			objects[1].Move(objects[1].x, objects[1].y);
 		}
-		update(time,gravitation);
+		update(time);
 		window.clear();
 		// draw all objects in vector
 		for (int i = 0; i < int(objects.size()); i++)
@@ -160,6 +156,10 @@ int main()
 			window.draw(objects[i].image);
 		}
 		window.display();
+		if (flagclose) {
+			window.close();
+			return 0;
+		}
 	}
 	return 0;
 }
