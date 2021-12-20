@@ -54,24 +54,27 @@ public:
 int window_width = 1200;
 int window_height = 800;
 bool onground = false;
-bool gravitation = true;
-bool flagclose = false;
+bool gravitation = true;//не могу прыгать если я двигаю персонажа левой кнопкой мыши
+bool flagclose = false;//попытка качественного закрытия окна
+int playerdirection;
 vector <Object> objects;
 
 Object sun("sun.png");
 Object player("banan.png");
+Object wall("wall.png");
+Object platform("platform.png");
 
 void update(float time) {
 	int g = 10;
 	if (gravitation == true) {
 		if (objects[1].mass != 0) {
-			if (objects[1].y >= window_height - objects[1].height/4)
+			if (objects[1].y >=window_height - objects[1].height/4)
 			{
 				objects[1].y = window_height - objects[1].height/4;
 				onground = true;
 			}
 
-			else {
+			else  {
 				objects[1].velocity.y = objects[1].velocity.y + g * time;
 				objects[1].y = objects[1].y + objects[1].velocity.y * time;
 				objects[1].Move(objects[1].x, objects[1].y);
@@ -95,30 +98,34 @@ int main()
 	objects.push_back(player);
 	objects[1].mass = 1;
 	Clock clock;
-	objects[1].Move(objects[1].width, objects[1].height / 2);
+	objects[1].Move(window_width/2+objects[1].height*2, objects[1].height / 2);
+	objects.push_back(wall);
+	objects.push_back(platform);
+	objects[2].Move(0, window_height);
+	objects[3].Move(window_width-700 , window_height - objects[3].height/4);
 	while (window.isOpen())
 	{
 		float time = clock.getElapsedTime().asMicroseconds();
 		clock.restart();
 		time = time / 80000;
-		Vector2i pos = Mouse::getPosition(window);//Р·Р°Р±РёСЂР°РµРј РєРѕРѕСЂРґ РєСѓСЂСЃРѕСЂР°
+		Vector2i pos = Mouse::getPosition(window);//забираем коорд курсора
 		Event event;
 		while (window.pollEvent(event))
 		{
 				if (Mouse::isButtonPressed(Mouse::Left))
-				{ //Р° РёРјРµРЅРЅРѕ Р»РµРІР°СЏ
+				{ //а именно левая
 					if (objects[1].image.getGlobalBounds().contains(pos.x, pos.y))
 					{
-						objects[1].moving = true;//РјРѕР¶РµРј РґРІРёРіР°С‚СЊ
+						objects[1].moving = true;//можем двигать
 						gravitation = false;
 					}
 				}
 			if (event.type == Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape)) flagclose=true; // 2 task 
 			if (event.type == Event::MouseButtonReleased) // 3 task
-			{//РµСЃР»Рё РѕС‚РїСѓСЃС‚РёР»Рё РєР»Р°РІРёС€Сѓ
+			{//если отпустили клавишу
 				if (event.key.code == Mouse::Left)
-				{ //Р° РёРјРµРЅРЅРѕ Р»РµРІСѓСЋ
-					objects[1].moving = false; //С‚Рѕ РЅРµ РјРѕР¶РµРј РґРІРёРіР°С‚СЊ 
+				{ //а именно левую
+					objects[1].moving = false; //то не можем двигать 
 					gravitation = true;
 				}
 			}
@@ -131,21 +138,32 @@ int main()
 					onground = false;
 				}
 			}
+			
+		}
+		FloatRect playerbounds = objects[1].image.getGlobalBounds();//координаты персонажа
+		FloatRect rectanglebounds = objects[2].image.getGlobalBounds();//координаты стены в виде прямоугольника
+
+		if (playerbounds.intersects(rectanglebounds)) {
+			if (playerdirection == 0) {
+				objects[1].Move(objects[1].x + 1, objects[1].y);
+			}
 		}
 		// 2 task
 		if ((Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::A)) && objects[1].x > objects[1].width/2) {
 			player.setImage("banan.png");
 			objects[1].x -= objects[1].velocity.x;
 			objects[1].Move(objects[1].x - 1, objects[1].y);
+			playerdirection = 0;
 		}
 		if ((Keyboard::isKeyPressed(Keyboard::Right) || Keyboard::isKeyPressed(Keyboard::D)) && objects[1].x < window_width - (objects[1].width/2)) {
 			player.setImage("bananreverse.png");
 			objects[1].x += objects[1].velocity.x;
 			objects[1].Move(objects[1].x + 1, objects[1].y);
+	
 		}
-		if (objects[1].moving) {//РµСЃР»Рё РјРѕР¶РµРј РґРІРёРіР°С‚СЊ; 3 task
-			objects[1].x = pos.x;//РґРІРёРіР°РµРј  РїРѕ РҐ
-			objects[1].y = pos.y ;//РґРІРёРіР°РµРј РїРѕ Y
+		if (objects[1].moving) {//если можем двигать; 3 task
+			objects[1].x = pos.x;//двигаем  по Х
+			objects[1].y = pos.y ;//двигаем по Y
 			objects[1].Move(objects[1].x, objects[1].y);
 		}
 		update(time);
@@ -154,11 +172,12 @@ int main()
 		for (int i = 0; i < int(objects.size()); i++)
 		{
 			window.draw(objects[i].image);
+			
 		}
 		window.display();
 		if (flagclose) {
 			window.close();
-			return 0;
+			break;
 		}
 	}
 	return 0;
