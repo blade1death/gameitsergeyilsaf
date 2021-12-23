@@ -54,8 +54,8 @@ public:
 int window_width = 1200;
 int window_height = 800;
 bool onground = false;
-bool gravitation = true;//не могу прыгать если я двигаю персонажа левой кнопкой мыши
-bool flagclose = false;//попытка качественного закрытия окна
+bool gravitation = true;//РЅРµ РјРѕРіСѓ РїСЂС‹РіР°С‚СЊ РµСЃР»Рё СЏ РґРІРёРіР°СЋ РїРµСЂСЃРѕРЅР°Р¶Р° Р»РµРІРѕР№ РєРЅРѕРїРєРѕР№ РјС‹С€Рё
+bool flagclose = false;//РїРѕРїС‹С‚РєР° РєР°С‡РµСЃС‚РІРµРЅРЅРѕРіРѕ Р·Р°РєСЂС‹С‚РёСЏ РѕРєРЅР°
 int playerdirection;
 vector <Object> objects;
 
@@ -63,6 +63,8 @@ Object sun("sun.png");
 Object player("banan.png");
 Object wall("wall.png");
 Object platform("platform.png");
+RectangleShape healthbar(Vector2f(100, 20));
+int healthpoint = 100;
 
 void update(float time) {
 	int g = 10;
@@ -98,51 +100,66 @@ int main()
 	objects.push_back(player);
 	objects[1].mass = 1;
 	Clock clock;
+	int max = 0;
 	objects[1].Move(window_width/2+objects[1].height*2, objects[1].height / 2);
-	objects.push_back(wall);
-	objects.push_back(platform);
-	objects[2].Move(0, window_height);
+	objects.push_back(wall);//objects[2] СЌС‚Рѕ СЃС‚РµРЅР° 
+	objects.push_back(platform);//objects[3] СЌС‚Рѕ РїР»Р°С‚С„РѕСЂРјР°
+	objects[2].Move(objects[2].width/2, window_height);
+	healthbar.setFillColor(Color::Red);
+	healthbar.setPosition(0, 380);
 	objects[3].Move(window_width-700 , window_height - objects[3].height/4);
+	objects[2].x = objects[2].width;
 	while (window.isOpen())
 	{
 		float time = clock.getElapsedTime().asMicroseconds();
 		clock.restart();
 		time = time / 80000;
-		Vector2i pos = Mouse::getPosition(window);//забираем коорд курсора
+		Vector2i pos = Mouse::getPosition(window);//Р·Р°Р±РёСЂР°РµРј РєРѕРѕСЂРґ РєСѓСЂСЃРѕСЂР°
 		Event event;
 		while (window.pollEvent(event))
 		{
 				if (Mouse::isButtonPressed(Mouse::Left))
-				{ //а именно левая
+				{
 					if (objects[1].image.getGlobalBounds().contains(pos.x, pos.y))
 					{
-						objects[1].moving = true;//можем двигать
+						objects[1].moving = true;//РјРѕР¶РµРј РґРІРёРіР°С‚СЊ
 						gravitation = false;
 					}
 				}
 			if (event.type == Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape)) flagclose=true; // 2 task 
 			if (event.type == Event::MouseButtonReleased) // 3 task
-			{//если отпустили клавишу
+			{//РµСЃР»Рё РѕС‚РїСѓСЃС‚РёР»Рё РєР»Р°РІРёС€Сѓ
 				if (event.key.code == Mouse::Left)
-				{ //а именно левую
-					objects[1].moving = false; //то не можем двигать 
+				{ //Р° РёРјРµРЅРЅРѕ Р»РµРІСѓСЋ
+					objects[1].moving = false; //С‚Рѕ РЅРµ РјРѕР¶РµРј РґРІРёРіР°С‚СЊ 
 					gravitation = true;
 				}
 			}
 			if (event.type == sf::Event::KeyPressed)
 			{
-				if (event.key.code == sf::Keyboard::Up && (onground))
+				if ((event.key.code == sf::Keyboard::Up|| event.key.code == sf::Keyboard::W) && (onground))
 				{
 					objects[1].velocity.y = 1;
 					objects[1].y -= 100;
 					onground = false;
 				}
 			}
+			if (Keyboard::isKeyPressed(Keyboard::E)&&objects[1].x<=objects[2].x+50) {
+				
+				if (healthpoint > 0) {
+					healthbar.setSize(Vector2f(100 - max, 20));
+					healthpoint -= 10;
+					max += 10;
+					if (max == 100) {
+						healthbar.setSize(Vector2f(0, 0));
+						objects[2].setScale(0, 0);
+					}
+				}
+			}
 			
 		}
-		FloatRect playerbounds = objects[1].image.getGlobalBounds();//координаты персонажа
-		FloatRect rectanglebounds = objects[2].image.getGlobalBounds();//координаты стены в виде прямоугольника
-
+		FloatRect playerbounds = objects[1].image.getGlobalBounds();//РєРѕРѕСЂРґРёРЅР°С‚С‹ РїРµСЂСЃРѕРЅР°Р¶Р°
+		FloatRect rectanglebounds = objects[2].image.getGlobalBounds();//РєРѕРѕСЂРґРёРЅР°С‚С‹ СЃС‚РµРЅС‹ РІ РІРёРґРµ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєР°
 		if (playerbounds.intersects(rectanglebounds)) {
 			if (playerdirection == 0) {
 				objects[1].Move(objects[1].x + 1, objects[1].y);
@@ -161,11 +178,13 @@ int main()
 			objects[1].Move(objects[1].x + 1, objects[1].y);
 	
 		}
-		if (objects[1].moving) {//если можем двигать; 3 task
-			objects[1].x = pos.x;//двигаем  по Х
-			objects[1].y = pos.y ;//двигаем по Y
+		if (objects[1].moving) {//РµСЃР»Рё РјРѕР¶РµРј РґРІРёРіР°С‚СЊ; 3 task
+			objects[1].x = pos.x;//РґРІРёРіР°РµРј  РїРѕ РҐ
+			objects[1].y = pos.y ;//РґРІРёРіР°РµРј РїРѕ Y
 			objects[1].Move(objects[1].x, objects[1].y);
 		}
+		if(objects[1].x)
+
 		update(time);
 		window.clear();
 		// draw all objects in vector
@@ -174,6 +193,7 @@ int main()
 			window.draw(objects[i].image);
 			
 		}
+		window.draw(healthbar);
 		window.display();
 		if (flagclose) {
 			window.close();
