@@ -54,15 +54,15 @@ public:
 int window_width = 1200;
 int window_height = 800;
 bool onground = false;
-bool gravitation = true;//не могу прыгать если я двигаю персонажа левой кнопкой мыши
-bool flagclose = false;//попытка качественного закрытия окна
+bool gravitation = true;//�� ���� ������� ���� � ������ ��������� ����� ������� ����
+bool flagclose = false;//������� ������������� �������� ����
 int playerdirection;
 vector <Object> objects;
 
 Object sun("sun.png");
 Object player("banan.png");
 Object wall("wall.png");
-Object platform("platform.png");
+Object platform("platform2.png");
 RectangleShape healthbar(Vector2f(100, 20));
 int healthpoint = 100;
 
@@ -93,28 +93,26 @@ void update(float time) {
 int main()
 {
 	RenderWindow window(VideoMode(window_width, window_height), "SFML works!");
-	// add sun to the vector of objects
 	objects.push_back(sun);
-	// move sun to the center of the screen
 	objects[0].Move(window_width / 2, sun.height / 2);
 	objects.push_back(player);
 	objects[1].mass = 1;
 	Clock clock;
 	int max = 0;
 	objects[1].Move(window_width/2+objects[1].height*2, objects[1].height / 2);
-	objects.push_back(wall);//objects[2] это стена 
-	objects.push_back(platform);//objects[3] это платформа
-	objects[2].Move(objects[2].width/2, window_height);
+	objects.push_back(wall);//objects[2] ��� ����� 
+	objects.push_back(platform);//objects[3] ��� ���������
+	objects[2].Move(objects[2].width/2, window_height-objects[3].height*2);
 	healthbar.setFillColor(Color::Red);
 	healthbar.setPosition(0, 380);
-	objects[3].Move(window_width-700 , window_height - objects[3].height/4);
+	objects[3].Move(window_width/2 , window_height - objects[3].height/4);
 	objects[2].x = objects[2].width;
 	while (window.isOpen())
 	{
 		float time = clock.getElapsedTime().asMicroseconds();
 		clock.restart();
 		time = time / 80000;
-		Vector2i pos = Mouse::getPosition(window);//забираем коорд курсора
+		Vector2i pos = Mouse::getPosition(window);//�������� ����� �������
 		Event event;
 		while (window.pollEvent(event))
 		{
@@ -122,16 +120,16 @@ int main()
 				{
 					if (objects[1].image.getGlobalBounds().contains(pos.x, pos.y))
 					{
-						objects[1].moving = true;//можем двигать
+						objects[1].moving = true;//����� �������
 						gravitation = false;
 					}
 				}
 			if (event.type == Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape)) flagclose=true; // 2 task 
 			if (event.type == Event::MouseButtonReleased) // 3 task
-			{//если отпустили клавишу
+			{//���� ��������� �������
 				if (event.key.code == Mouse::Left)
-				{ //а именно левую
-					objects[1].moving = false; //то не можем двигать 
+				{ //� ������ �����
+					objects[1].moving = false; //�� �� ����� ������� 
 					gravitation = true;
 				}
 			}
@@ -142,9 +140,10 @@ int main()
 					objects[1].velocity.y = 1;
 					objects[1].y -= 100;
 					onground = false;
+					playerdirection = 2;
 				}
 			}
-			if (Keyboard::isKeyPressed(Keyboard::E)&&objects[1].x<=objects[2].x+50) {
+			if (Keyboard::isKeyPressed(Keyboard::E)&&(objects[1].x<=objects[2].x+45)&&(playerdirection==0)){
 				
 				if (healthpoint > 0) {
 					healthbar.setSize(Vector2f(100 - max, 20));
@@ -158,11 +157,18 @@ int main()
 			}
 			
 		}
-		FloatRect playerbounds = objects[1].image.getGlobalBounds();//координаты персонажа
-		FloatRect rectanglebounds = objects[2].image.getGlobalBounds();//координаты стены в виде прямоугольника
-		if (playerbounds.intersects(rectanglebounds)) {
+		FloatRect playerbounds = objects[1].image.getGlobalBounds();//���������� ���������
+		FloatRect rectanglebounds = objects[2].image.getGlobalBounds();//���������� ����� � ���� ��������������
+		FloatRect platformbounds = objects[3].image.getGlobalBounds();
+		if (playerbounds.intersects(rectanglebounds)||playerbounds.intersects(platformbounds)) {
 			if (playerdirection == 0) {
 				objects[1].Move(objects[1].x + 1, objects[1].y);
+			}
+			if (playerdirection == 1) {
+				objects[1].Move(objects[1].x - 1, objects[1].y);
+			}
+			if (playerdirection == 2) {
+				objects[1].Move(objects[1].x, objects[1].y - 10);
 			}
 		}
 		// 2 task
@@ -176,14 +182,14 @@ int main()
 			player.setImage("bananreverse.png");
 			objects[1].x += objects[1].velocity.x;
 			objects[1].Move(objects[1].x + 1, objects[1].y);
+			playerdirection = 1;
 	
 		}
-		if (objects[1].moving) {//если можем двигать; 3 task
-			objects[1].x = pos.x;//двигаем  по Х
-			objects[1].y = pos.y ;//двигаем по Y
+		if (objects[1].moving) {//���� ����� �������; 3 task
+			objects[1].x = pos.x;//�������  �� �
+			objects[1].y = pos.y ;//������� �� Y
 			objects[1].Move(objects[1].x, objects[1].y);
 		}
-		if(objects[1].x)
 
 		update(time);
 		window.clear();
