@@ -54,8 +54,8 @@ public:
 int window_width = 1200;
 int window_height = 800;
 bool onground = false;
-bool gravitation = true;//�� ���� ������� ���� � ������ ��������� ����� ������� ����
-bool flagclose = false;//������� ������������� �������� ����
+bool gravitation = true;//не могу прыгать если я двигаю персонажа левой кнопкой мыши
+bool flagclose = false;//попытка качественного закрытия окна
 int playerdirection;
 int frd=0;
 int last_frd = 0;
@@ -125,8 +125,8 @@ int main()
 
 	objects.push_back(sun);
 	objects.push_back(player);
-	objects.push_back(wall);//objects[2] ��� ����� 
-	objects.push_back(platform);//objects[3] ��� ���������
+	objects.push_back(wall);//objects[2] это стена 
+	objects.push_back(platform);//objects[3] это платформа
 
 
 	objects[1].mass = 1;
@@ -146,7 +146,7 @@ int main()
 		float time = clock.getElapsedTime().asMicroseconds();
 		clock.restart();
 		time = time / 80000;
-		Vector2i pos = Mouse::getPosition(window);//�������� ����� �������
+		Vector2i pos = Mouse::getPosition(window);//забираем коорд курсора
 		Event event;
 		while (window.pollEvent(event))
 		{
@@ -188,8 +188,8 @@ int main()
 
 		}
 
-		FloatRect playerbounds = objects[1].image.getGlobalBounds();//���������� ���������
-		FloatRect rectanglebounds = objects[2].image.getGlobalBounds();//���������� ����� � ���� ��������������
+		FloatRect playerbounds = objects[1].image.getGlobalBounds();//координаты персонажа
+		FloatRect rectanglebounds = objects[2].image.getGlobalBounds();//координаты стены в виде прямоугольника
 		FloatRect platformbounds = objects[3].image.getGlobalBounds();
 		if (playerbounds.intersects(rectanglebounds)) {
 			if (playerdirection == 0) {
