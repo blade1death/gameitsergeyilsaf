@@ -1,3 +1,5 @@
+
+
 #include <iostream>
 #include <vector>
 #include <SFML/Graphics.hpp>
@@ -57,7 +59,7 @@ bool onground = false;
 bool gravitation = true;//не могу прыгать если я двигаю персонажа левой кнопкой мыши
 int flagclose = 0;
 int playerdirection;
-int frd=0;
+int frd = 0;
 int last_frd = 0;
 int number_of_menu;
 vector <Object> objects;
@@ -72,24 +74,26 @@ Object buttonexit("mousebuttonexit.png");
 
 
 RectangleShape healthbar(Vector2f(100, 20));
+RectangleShape healtpalyer(Vector2f(50, 10));
 
 int healthpoint = 100;
 
-void update(float time, int &frd,int &last_frd ) {
+void update(float time, int& frd, int& last_frd) {
 	int g = 10;
 	if (gravitation == true) {
 		if (objects[1].mass != 0) {
-			if (objects[1].y >=window_height - objects[3].height-5)
+			if (objects[1].y >= window_height - objects[3].height - 5)
 			{
-				objects[1].y = window_height - objects[3].height-5;
+				objects[1].y = window_height - objects[3].height - 5;
 				onground = true;
 				objects[1].velocity.y = 0;
 			}
 
-			else  {
+			else {
 				objects[1].velocity.y = objects[1].velocity.y + g * time;
 				objects[1].y = objects[1].y + objects[1].velocity.y * time;
 				objects[1].Move(objects[1].x, objects[1].y);
+				healtpalyer.setPosition(objects[1].x - 48, objects[1].y - 64);
 			}
 		}
 		else {
@@ -102,21 +106,24 @@ void update(float time, int &frd,int &last_frd ) {
 		objects[1].velocity.x = -1;
 		objects[1].x += (objects[1].velocity.x);
 		objects[1].Move(objects[1].x, objects[1].y);
+		healtpalyer.setPosition(objects[1].x-48, objects[1].y - 64);
 		objects[1].velocity.x = 0;
 		frd = 0;
 	}
 	if (frd == 2 && objects[1].x < window_width - (objects[1].width / 2)) {
 		playerdirection = 1;
 		player.setImage("bananreverse.png");
-		objects[1].velocity.x =1;
+		objects[1].velocity.x = 1;
 		objects[1].x += (objects[1].velocity.x);
 		objects[1].Move(objects[1].x, objects[1].y);
+		healtpalyer.setPosition(objects[1].x-48 , objects[1].y - 64);
 		objects[1].velocity.x = 0;
 		frd = 0;
 	}
-	if (last_frd == 3&&onground) {
+	if (last_frd == 3 && onground) {
 		objects[1].velocity.y = 1;
 		objects[1].y -= 100;
+		healtpalyer.setPosition(objects[1].x-48 , objects[1].y - 64);
 		onground = false;
 		last_frd = 0;
 	}
@@ -128,7 +135,7 @@ int main()
 {
 	RenderWindow window(VideoMode(window_width, window_height), "SFML works!");
 	Clock clock;
-	int max = 0;
+	int max = 10;
 
 	objects.push_back(sun);
 	objects.push_back(player);
@@ -140,12 +147,12 @@ int main()
 
 
 	objects[1].mass = 1;
-	
-	objects[1].Move(window_width/2+objects[1].height*2, objects[1].height / 2);
-	objects[2].Move(objects[2].width/2, window_height-objects[3].height*3);
-	objects[3].Move(window_width/2 , window_height - objects[3].height/4);
+
+	objects[1].Move(window_width / 2 + objects[1].height * 2, objects[1].height / 2);
+	objects[2].Move(objects[2].width / 2, window_height - objects[3].height * 3);
+	objects[3].Move(window_width / 2, window_height - objects[3].height / 4);
 	objects[0].Move(window_width / 2, sun.height / 2);
-	objects[4].Move(window_width/2 , window_height/2);
+	objects[4].Move(window_width / 2, window_height / 2);
 	objects[5].Move(window_width / 2 - 256, window_height / 2);
 	objects[6].Move(window_width / 2 + 256, window_height / 2);
 
@@ -153,7 +160,9 @@ int main()
 
 	healthbar.setFillColor(Color::Red);
 	healthbar.setPosition(0, window_height - (objects[2].height + 25));
-	
+
+	healtpalyer.setFillColor(Color::Red);
+	healtpalyer.setPosition(objects[1].x-48, objects[1].y - 64);
 
 
 	SoundBuffer shootBuffer;
@@ -167,12 +176,9 @@ int main()
 		time = time / 80000;
 		Vector2i pos = Mouse::getPosition(window);//забираем коорд курсора
 		Event event;
-		if (flagclose==1) {
+		if (flagclose == 1) {
 			while (window.pollEvent(event))
 			{
-				if (Keyboard::isKeyPressed(Keyboard::W)) {
-					last_frd = 3;
-				}
 				if (Mouse::isButtonPressed(Mouse::Left))
 				{
 					if (objects[1].image.getGlobalBounds().contains(pos.x, pos.y))
@@ -181,7 +187,7 @@ int main()
 						gravitation = false;
 					}
 				}
-				if (Keyboard::isKeyPressed(Keyboard::Escape)) flagclose =0; 
+				if (Keyboard::isKeyPressed(Keyboard::Escape)) flagclose = 0;
 				if (event.type == Event::MouseButtonReleased)
 				{
 					if (event.key.code == Mouse::Left)
@@ -204,13 +210,15 @@ int main()
 							}
 						}
 					}
+					if (event.key.code == sf::Keyboard::W) {
+						last_frd = 3;
+					}
 				}
 
 			}
 
 			FloatRect playerbounds = objects[1].image.getGlobalBounds();//координаты персонажа
 			FloatRect rectanglebounds = objects[2].image.getGlobalBounds();//координаты стены в виде прямоугольника
-			FloatRect platformbounds = objects[3].image.getGlobalBounds();
 			if (playerbounds.intersects(rectanglebounds)) {
 				if (playerdirection == 0) {
 					objects[1].Move(objects[1].x + 1, objects[1].y);
@@ -223,6 +231,7 @@ int main()
 				objects[1].x = pos.x;
 				objects[1].y = pos.y;
 				objects[1].Move(objects[1].x, objects[1].y);
+				healtpalyer.setPosition(objects[1].x - 48, objects[1].y - 64);
 			}
 			if (Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::A)) {
 				frd = 1;
@@ -235,10 +244,11 @@ int main()
 			window.clear();
 			for (int i = 0; i < int(objects.size()); i++)
 			{
-				if(i!=4&&i!=5&&i!=6)
+				if (i != 4 && i != 5 && i != 6)
 					window.draw(objects[i].image);
 
 			}
+			window.draw(healtpalyer);
 			window.draw(healthbar);
 			window.display();
 		}
@@ -247,14 +257,14 @@ int main()
 				if (objects[5].image.getGlobalBounds().contains(pos.x, pos.y)) {
 					if (Mouse::isButtonPressed(Mouse::Left))
 						flagclose = 1;
-				}if (objects[6].image.getGlobalBounds().contains(pos.x, pos.y)&& Mouse::isButtonPressed(Mouse::Left)) {
+				}if (objects[6].image.getGlobalBounds().contains(pos.x, pos.y) && Mouse::isButtonPressed(Mouse::Left)) {
 					window.close();
 					break;
 				}
 				if (event.type == sf::Event::KeyPressed)
 				{
 					if (event.key.code == sf::Keyboard::Escape) {
-						flagclose = 0;
+						window.close();
 					}
 				}
 			}
