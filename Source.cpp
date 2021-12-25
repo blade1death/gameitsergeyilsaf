@@ -155,9 +155,10 @@ int main()
 	healthbar.setPosition(0, window_height - (objects[2].height + 25));
 	
 
-	Music music1; //Музыка в меню
-	music1.openFromFile("atack.ogg");
-	music1.play(); //Музыка в меню
+
+	SoundBuffer shootBuffer;
+	shootBuffer.loadFromFile("atack.ogg");
+	Sound shoot(shootBuffer);
 
 	while (window.isOpen())
 	{
@@ -192,6 +193,7 @@ int main()
 				if (event.type == sf::Event::KeyPressed)
 				{
 					if (event.key.code == sf::Keyboard::E && (objects[1].x <= objects[2].x + 45) && (playerdirection == 0)) {
+						shoot.play();
 						if (healthpoint > 0) {
 							healthbar.setSize(Vector2f(100 - max, 20));
 							healthpoint -= 10;
