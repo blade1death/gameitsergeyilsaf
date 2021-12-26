@@ -102,7 +102,7 @@ void update(float time, int& frd, int& last_frd) {
 				objects[1].velocity.y = objects[1].velocity.y + g * time;
 				objects[1].y = objects[1].y + objects[1].velocity.y * time;
 				objects[1].Move(objects[1].x, objects[1].y);
-				healtpalyer.setPosition(objects[1].x - 48, objects[1].y - 64);
+				healtpalyer.setPosition(objects[1].x - 24, objects[1].y - 64);
 			}
 		}
 		else {
@@ -115,7 +115,7 @@ void update(float time, int& frd, int& last_frd) {
 			objects[1].velocity.x = -1;
 			objects[1].x += (objects[1].velocity.x);
 			objects[1].Move(objects[1].x, objects[1].y);
-			healtpalyer.setPosition(objects[1].x - 48, objects[1].y - 64);
+			healtpalyer.setPosition(objects[1].x - 24, objects[1].y - 64);
 			objects[1].velocity.x = 0;
 			frd = 0;
 		}
@@ -125,14 +125,14 @@ void update(float time, int& frd, int& last_frd) {
 			objects[1].velocity.x = 1;
 			objects[1].x += (objects[1].velocity.x);
 			objects[1].Move(objects[1].x, objects[1].y);
-			healtpalyer.setPosition(objects[1].x - 48, objects[1].y - 64);
+			healtpalyer.setPosition(objects[1].x - 24, objects[1].y - 64);
 			objects[1].velocity.x = 0;
 			frd = 0;
 	}
 	if (last_frd == 3 && onground) {
 		objects[1].velocity.y = 1;
 		objects[1].y -= 100;
-		healtpalyer.setPosition(objects[1].x-48 , objects[1].y - 64);
+		healtpalyer.setPosition(objects[1].x-24 , objects[1].y - 64);
 		onground = false;
 		last_frd = 0;
 	}
@@ -240,7 +240,7 @@ int main()
 				objects[1].x = pos.x;
 				objects[1].y = pos.y;
 				objects[1].Move(objects[1].x, objects[1].y);
-				healtpalyer.setPosition(objects[1].x - 48, objects[1].y - 64);
+				healtpalyer.setPosition(objects[1].x - 24, objects[1].y - 64);
 			}
 
 			update(time, frd, last_frd);
