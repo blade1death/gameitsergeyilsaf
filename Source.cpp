@@ -62,6 +62,7 @@ int playerdirection;
 int frd = 0;
 int last_frd = 0;
 int number_of_menu;
+bool jump = false;
 vector <Object> objects;
 
 Object sun("sun.png");
@@ -75,11 +76,15 @@ Object buttonexit("mousebuttonexit.png");
 
 RectangleShape healthbar(Vector2f(100, 20));
 RectangleShape healtpalyer(Vector2f(50, 10));
+RectangleShape rectangle2(Vector2f(400, 100));
 
 int healthpoint = 100;
 
 void update(float time, int& frd, int& last_frd) {
 	int g = 10;
+	FloatRect playerbounds = objects[1].image.getGlobalBounds();//координаты персонажа
+	FloatRect rectanglebounds = objects[2].image.getGlobalBounds();//координаты стены в виде прямоугольника
+	FloatRect rectangle2Bounds = rectangle2.getGlobalBounds();
 	if (gravitation == true) {
 		if (objects[1].mass != 0) {
 			if (objects[1].y >= window_height - objects[3].height - 5)
@@ -101,30 +106,33 @@ void update(float time, int& frd, int& last_frd) {
 		}
 	}
 	if (frd == 1 && objects[1].x > objects[1].width / 2) {
-		playerdirection = 0;
-		player.setImage("banan.png");
-		objects[1].velocity.x = -1;
-		objects[1].x += (objects[1].velocity.x);
-		objects[1].Move(objects[1].x, objects[1].y);
-		healtpalyer.setPosition(objects[1].x-48, objects[1].y - 64);
-		objects[1].velocity.x = 0;
-		frd = 0;
+		if (playerbounds.intersects(rectanglebounds) == false) {
+			player.setImage("banan.png");
+			objects[1].velocity.x = -1;
+			objects[1].x += (objects[1].velocity.x);
+			objects[1].Move(objects[1].x, objects[1].y);
+			healtpalyer.setPosition(objects[1].x - 48, objects[1].y - 64);
+			objects[1].velocity.x = 0;
+			frd = 0;
+		}
 	}
 	if (frd == 2 && objects[1].x < window_width - (objects[1].width / 2)) {
-		playerdirection = 1;
-		player.setImage("bananreverse.png");
-		objects[1].velocity.x = 1;
-		objects[1].x += (objects[1].velocity.x);
-		objects[1].Move(objects[1].x, objects[1].y);
-		healtpalyer.setPosition(objects[1].x-48 , objects[1].y - 64);
-		objects[1].velocity.x = 0;
-		frd = 0;
+		if (playerbounds.intersects(rectangle2Bounds) == false) {
+			player.setImage("bananreverse.png");
+			objects[1].velocity.x = 1;
+			objects[1].x += (objects[1].velocity.x);
+			objects[1].Move(objects[1].x, objects[1].y);
+			healtpalyer.setPosition(objects[1].x - 48, objects[1].y - 64);
+			objects[1].velocity.x = 0;
+			frd = 0;
+		}
 	}
 	if (last_frd == 3 && onground) {
 		objects[1].velocity.y = 1;
 		objects[1].y -= 100;
 		healtpalyer.setPosition(objects[1].x-48 , objects[1].y - 64);
 		onground = false;
+		jump = false;
 		last_frd = 0;
 	}
 
@@ -163,7 +171,8 @@ int main()
 
 	healtpalyer.setFillColor(Color::Red);
 	healtpalyer.setPosition(objects[1].x-48, objects[1].y - 64);
-
+	rectangle2.setFillColor(Color::Red);
+	rectangle2.setPosition(window_width - 200, window_height - objects[3].height*2);
 
 	SoundBuffer shootBuffer;
 	shootBuffer.loadFromFile("atack.ogg");
@@ -212,21 +221,13 @@ int main()
 					}
 					if (event.key.code == sf::Keyboard::W) {
 						last_frd = 3;
+						jump = true;
 					}
 				}
 
 			}
 
-			FloatRect playerbounds = objects[1].image.getGlobalBounds();//координаты персонажа
-			FloatRect rectanglebounds = objects[2].image.getGlobalBounds();//координаты стены в виде прямоугольника
-			if (playerbounds.intersects(rectanglebounds)) {
-				if (playerdirection == 0) {
-					objects[1].Move(objects[1].x + 1, objects[1].y);
-				}
-				if (playerdirection == 1) {
-					objects[1].Move(objects[1].x - 1, objects[1].y);
-				}
-			}
+			
 			if (objects[1].moving) {
 				objects[1].x = pos.x;
 				objects[1].y = pos.y;
@@ -248,6 +249,7 @@ int main()
 					window.draw(objects[i].image);
 
 			}
+			window.draw(rectangle2);
 			window.draw(healtpalyer);
 			window.draw(healthbar);
 			window.display();
