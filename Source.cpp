@@ -56,7 +56,11 @@ public:
 int window_width = 1200;
 int window_height = 800;
 bool onground = false;
+<<<<<<< HEAD
 bool gravitation = true;//íå ìîãó ïðûãàòü åñëè ÿ äâèãàþ ïåðñîíàæà ëåâîé êíîïêîé ìûøè
+=======
+bool gravitation = true;//Ð½Ðµ Ð¼Ð¾Ð³Ñƒ Ð¿Ñ€Ñ‹Ð³Ð°Ñ‚ÑŒ ÐµÑÐ»Ð¸ Ñ Ð´Ð²Ð¸Ð³Ð°ÑŽ Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶Ð° Ð»ÐµÐ²Ð¾Ð¹ ÐºÐ½Ð¾Ð¿ÐºÐ¾Ð¹ Ð¼Ñ‹ÑˆÐ¸
+>>>>>>> 5dd463480c65aea022a3df1475bbaa1b24c2b915
 int flagclose = 0;
 int playerdirection;
 int frd = 0;
@@ -82,8 +86,13 @@ int healthpoint = 100;
 
 void update(float time, int& frd, int& last_frd) {
 	int g = 10;
+<<<<<<< HEAD
 	FloatRect playerbounds = objects[1].image.getGlobalBounds();//êîîðäèíàòû ïåðñîíàæà
 	FloatRect rectanglebounds = objects[2].image.getGlobalBounds();//êîîðäèíàòû ñòåíû â âèäå ïðÿìîóãîëüíèêà
+=======
+	FloatRect playerbounds = objects[1].image.getGlobalBounds();//ÐºÐ¾Ð¾Ñ€Ð´Ð¸Ð½Ð°Ñ‚Ñ‹ Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶Ð°
+	FloatRect rectanglebounds = objects[2].image.getGlobalBounds();//ÐºÐ¾Ð¾Ñ€Ð´Ð¸Ð½Ð°Ñ‚Ñ‹ ÑÑ‚ÐµÐ½Ñ‹ Ð² Ð²Ð¸Ð´Ðµ Ð¿Ñ€ÑÐ¼Ð¾ÑƒÐ³Ð¾Ð»ÑŒÐ½Ð¸ÐºÐ°
+>>>>>>> 5dd463480c65aea022a3df1475bbaa1b24c2b915
 	FloatRect rectangle2Bounds = objects[7].image.getGlobalBounds();
 	if (gravitation == true) {
 		if (objects[1].mass != 0) {
@@ -149,11 +158,19 @@ int main()
 
 	objects.push_back(sun);
 	objects.push_back(player);
+<<<<<<< HEAD
 	objects.push_back(wall);//objects[2] ýòî ñòåíà 
 	objects.push_back(platform);//objects[3] ýòî ïëàòôîðìà
 	objects.push_back(background);//îbkects[4] ýòî ôîí ìåíþ
 	objects.push_back(buttonstart);//objects[5] ýòî êíîïêà ñòàðòà â ìåíþ
 	objects.push_back(buttonexit);//objects[6] ýòî êíîïêà âûõîäà èç èãðû
+=======
+	objects.push_back(wall);//objects[2] ÑÑ‚Ð¾ ÑÑ‚ÐµÐ½Ð° 
+	objects.push_back(platform);//objects[3] ÑÑ‚Ð¾ Ð¿Ð»Ð°Ñ‚Ñ„Ð¾Ñ€Ð¼Ð°
+	objects.push_back(background);//Ð¾bkects[4] ÑÑ‚Ð¾ Ñ„Ð¾Ð½ Ð¼ÐµÐ½ÑŽ
+	objects.push_back(buttonstart);//objects[5] ÑÑ‚Ð¾ ÐºÐ½Ð¾Ð¿ÐºÐ° ÑÑ‚Ð°Ñ€Ñ‚Ð° Ð² Ð¼ÐµÐ½ÑŽ
+	objects.push_back(buttonexit);//objects[6] ÑÑ‚Ð¾ ÐºÐ½Ð¾Ð¿ÐºÐ° Ð²Ñ‹Ñ…Ð¾Ð´Ð° Ð¸Ð· Ð¸Ð³Ñ€Ñ‹
+>>>>>>> 5dd463480c65aea022a3df1475bbaa1b24c2b915
 	objects.push_back(platform2);
 
 
@@ -187,7 +204,11 @@ int main()
 		float time = clock.getElapsedTime().asMicroseconds();
 		clock.restart();
 		time = time / 80000;
+<<<<<<< HEAD
 		Vector2i pos = Mouse::getPosition(window);//çàáèðàåì êîîðä êóðñîðà
+=======
+		Vector2i pos = Mouse::getPosition(window);//Ð·Ð°Ð±Ð¸Ñ€Ð°ÐµÐ¼ ÐºÐ¾Ð¾Ñ€Ð´ ÐºÑƒÑ€ÑÐ¾Ñ€Ð°
+>>>>>>> 5dd463480c65aea022a3df1475bbaa1b24c2b915
 		Event event;
 		if (flagclose == 1) {
 			while (window.pollEvent(event))
