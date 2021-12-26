@@ -72,11 +72,11 @@ Object platform("platform2.png");
 Object background("start.png");
 Object buttonstart("mousebuttonstart.png");
 Object buttonexit("mousebuttonexit.png");
+Object platform2("block.png");
 
 
 RectangleShape healthbar(Vector2f(100, 20));
 RectangleShape healtpalyer(Vector2f(50, 10));
-RectangleShape rectangle2(Vector2f(400, 100));
 
 int healthpoint = 100;
 
@@ -84,7 +84,7 @@ void update(float time, int& frd, int& last_frd) {
 	int g = 10;
 	FloatRect playerbounds = objects[1].image.getGlobalBounds();//координаты персонажа
 	FloatRect rectanglebounds = objects[2].image.getGlobalBounds();//координаты стены в виде прямоугольника
-	FloatRect rectangle2Bounds = rectangle2.getGlobalBounds();
+	FloatRect rectangle2Bounds = objects[7].image.getGlobalBounds();
 	if (gravitation == true) {
 		if (objects[1].mass != 0) {
 			if (objects[1].y >= window_height - objects[3].height - 5)
@@ -93,7 +93,11 @@ void update(float time, int& frd, int& last_frd) {
 				onground = true;
 				objects[1].velocity.y = 0;
 			}
-
+			else if (objects[1].y>= window_height - objects[3].height - 42+5 &&objects[1].x>objects[7].x) {
+				objects[1].y = window_height - objects[3].height - 42+5;
+				onground = true;
+				objects[1].velocity.y = 0;
+			}
 			else {
 				objects[1].velocity.y = objects[1].velocity.y + g * time;
 				objects[1].y = objects[1].y + objects[1].velocity.y * time;
@@ -117,7 +121,6 @@ void update(float time, int& frd, int& last_frd) {
 		}
 	}
 	if (frd == 2 && objects[1].x < window_width - (objects[1].width / 2)) {
-		if (playerbounds.intersects(rectangle2Bounds) == false) {
 			player.setImage("bananreverse.png");
 			objects[1].velocity.x = 1;
 			objects[1].x += (objects[1].velocity.x);
@@ -125,23 +128,22 @@ void update(float time, int& frd, int& last_frd) {
 			healtpalyer.setPosition(objects[1].x - 48, objects[1].y - 64);
 			objects[1].velocity.x = 0;
 			frd = 0;
-		}
 	}
 	if (last_frd == 3 && onground) {
 		objects[1].velocity.y = 1;
 		objects[1].y -= 100;
 		healtpalyer.setPosition(objects[1].x-48 , objects[1].y - 64);
 		onground = false;
-		jump = false;
 		last_frd = 0;
 	}
-
-
+	if (objects[1].x + 20 == objects[7].x&&objects[1].y>=742) {
+		objects[1].Move(objects[1].x - 1, objects[1].y);
+	}
 }
 
 int main()
 {
-	RenderWindow window(VideoMode(window_width, window_height), "SFML works!");
+	RenderWindow window(VideoMode(window_width, window_height), "banana adventure!");
 	Clock clock;
 	int max = 10;
 
@@ -152,6 +154,7 @@ int main()
 	objects.push_back(background);//оbkects[4] это фон меню
 	objects.push_back(buttonstart);//objects[5] это кнопка старта в меню
 	objects.push_back(buttonexit);//objects[6] это кнопка выхода из игры
+	objects.push_back(platform2);
 
 
 	objects[1].mass = 1;
@@ -163,16 +166,17 @@ int main()
 	objects[4].Move(window_width / 2, window_height / 2);
 	objects[5].Move(window_width / 2 - 256, window_height / 2);
 	objects[6].Move(window_width / 2 + 256, window_height / 2);
+	objects[7].Move(window_width - 100, window_height - objects[3].height-10);
 
 	objects[2].x = objects[2].width;
-
+	objects[7].y = window_height - objects[3].height - 42+14;
+	objects[7].x = window_height - objects[7].width/2+300;
 	healthbar.setFillColor(Color::Red);
 	healthbar.setPosition(0, window_height - (objects[2].height + 25));
 
 	healtpalyer.setFillColor(Color::Red);
 	healtpalyer.setPosition(objects[1].x-48, objects[1].y - 64);
-	rectangle2.setFillColor(Color::Red);
-	rectangle2.setPosition(window_width - 200, window_height - objects[3].height*2);
+
 
 	SoundBuffer shootBuffer;
 	shootBuffer.loadFromFile("atack.ogg");
@@ -207,7 +211,7 @@ int main()
 				}
 				if (event.type == sf::Event::KeyPressed)
 				{
-					if (event.key.code == sf::Keyboard::E && (objects[1].x <= objects[2].x + 45) && (playerdirection == 0)) {
+					if (event.key.code == sf::Keyboard::E && (objects[1].x <= objects[2].x + 45) && (frd==1)) {
 						shoot.play();
 						if (healthpoint > 0) {
 							healthbar.setSize(Vector2f(100 - max, 20));
@@ -221,24 +225,22 @@ int main()
 					}
 					if (event.key.code == sf::Keyboard::W) {
 						last_frd = 3;
-						jump = true;
+
 					}
 				}
 
-			}
-
-			
-			if (objects[1].moving) {
-				objects[1].x = pos.x;
-				objects[1].y = pos.y;
-				objects[1].Move(objects[1].x, objects[1].y);
-				healtpalyer.setPosition(objects[1].x - 48, objects[1].y - 64);
 			}
 			if (Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::A)) {
 				frd = 1;
 			}
 			if (Keyboard::isKeyPressed(Keyboard::Right) || Keyboard::isKeyPressed(Keyboard::D)) {
 				frd = 2;
+			}
+			if (objects[1].moving) {
+				objects[1].x = pos.x;
+				objects[1].y = pos.y;
+				objects[1].Move(objects[1].x, objects[1].y);
+				healtpalyer.setPosition(objects[1].x - 48, objects[1].y - 64);
 			}
 
 			update(time, frd, last_frd);
@@ -249,7 +251,6 @@ int main()
 					window.draw(objects[i].image);
 
 			}
-			window.draw(rectangle2);
 			window.draw(healtpalyer);
 			window.draw(healthbar);
 			window.display();
