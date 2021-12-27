@@ -1,5 +1,3 @@
-
-
 #include <iostream>
 #include <vector>
 #include <SFML/Graphics.hpp>
@@ -20,6 +18,7 @@ public:
 	sf::Vector2f velocity;
 	bool moving = false;
 	bool can_collide = false;
+	bool gravitation = true;
 
 	Object(string filename) {
 		texture.loadFromFile(filename);
@@ -56,10 +55,11 @@ public:
 int window_width = 1200;
 int window_height = 800;
 bool onground = false;
-bool gravitation = true;
+
 int flagclose = 0;
 int frd = 0;
 int last_frd = 0;
+int playerdirection = 0;
 vector <Object> objects;
 
 Object sun("sun.png");
@@ -83,7 +83,8 @@ void update(float time, int& frd, int& last_frd) {
 	FloatRect playerbounds = objects[1].image.getGlobalBounds();//координаты персонажа
 	FloatRect rectanglebounds = objects[2].image.getGlobalBounds();//координаты стены в виде прямоугольника
 	FloatRect rectangle2Bounds = objects[7].image.getGlobalBounds();
-	if (gravitation == true) {
+	FloatRect pol = objects[2].image.getGlobalBounds();
+	if (objects[1].gravitation == true) {
 		if (objects[1].mass != 0) {
 			if (objects[1].y >= window_height - objects[3].height - 5)
 			{
@@ -103,20 +104,35 @@ void update(float time, int& frd, int& last_frd) {
 				healtpalyer.setPosition(objects[1].x - 24, objects[1].y - 64);
 			}
 		}
+	}
+	if (objects[2].gravitation == true){
+		if (objects[2].mass != 0) {
+			if (objects[2].y >= window_height - objects[3].height - objects[2].height / 2 + 10)
+			{
+				objects[2].y = window_height - objects[3].height - objects[2].height / 2 + 10;
+				objects[2].velocity.y = 0;
+
+			}
+			else {
+				objects[2].velocity.y = objects[2].velocity.y + g * time;
+				objects[2].y = objects[2].y + objects[2].velocity.y * time;
+				objects[2].Move(objects[2].x, objects[2].y);
+				healthbar.setPosition(objects[2].x - 50, objects[2].y - 130);
+				whitebar.setPosition(objects[2].x - 50, objects[2].y - 130);
+			}
+		}
 		else {
-			objects[1].y = objects[1].y;
+			objects[2].y = objects[2].y;
 		}
 	}
 	if (frd == 1 && objects[1].x > objects[1].width / 2) {
-		if (playerbounds.intersects(rectanglebounds) == false) {
-			player.setImage("banan.png");
-			objects[1].velocity.x = -1;
-			objects[1].x += (objects[1].velocity.x);
-			objects[1].Move(objects[1].x, objects[1].y);
-			healtpalyer.setPosition(objects[1].x - 24, objects[1].y - 64);
-			objects[1].velocity.x = 0;
-			frd = 0;
-		}
+		player.setImage("banan.png");
+		objects[1].velocity.x = -1;
+		objects[1].x += (objects[1].velocity.x);
+		objects[1].Move(objects[1].x, objects[1].y);
+		healtpalyer.setPosition(objects[1].x - 24, objects[1].y - 64);
+		objects[1].velocity.x = 0;
+		frd = 0;
 	}
 	if (frd == 2 && objects[1].x < window_width - (objects[1].width / 2)) {
 		player.setImage("bananreverse.png");
@@ -134,7 +150,7 @@ void update(float time, int& frd, int& last_frd) {
 		onground = false;
 		last_frd = 0;
 	}
-	if (objects[1].x + 20 == objects[7].x && objects[1].y >= 742) {
+	if (objects[1].x + 22 == objects[7].x && objects[1].y >= 740) {
 		objects[1].Move(objects[1].x - 1, objects[1].y);
 	}
 }
@@ -156,6 +172,7 @@ int main()
 
 
 	objects[1].mass = 1;
+	objects[2].mass = 1;
 
 	objects[1].Move(window_width / 2 + objects[1].height * 2, objects[1].height / 2);
 	objects[2].Move(objects[2].width / 2, window_height - objects[3].height * 3);
@@ -166,11 +183,10 @@ int main()
 	objects[6].Move(window_width / 2 + 256, window_height / 2);
 	objects[7].Move(window_width - 100, window_height - objects[3].height - 10);
 
-	objects[2].x = objects[2].width;
 	objects[7].y = window_height - objects[3].height - 42 + 14;
 	objects[7].x = window_height - objects[7].width / 2 + 300;
 
-
+	objects[2].x = objects[2].width;
 	healthbar.setFillColor(Color::Red);
 	healthbar.setPosition(0, window_height - (objects[2].height + 25));
 	whitebar.setFillColor(Color::White);
@@ -196,37 +212,65 @@ int main()
 			{
 				if (Mouse::isButtonPressed(Mouse::Left))
 				{
-					if (objects[1].image.getGlobalBounds().contains(pos.x, pos.y))
+					if (objects[1].image.getGlobalBounds().contains(pos.x, pos.y)&&objects[2].moving==false)
 					{
 						objects[1].moving = true;
-						gravitation = false;
+						objects[1].gravitation = false;
+					}
+					if (objects[2].image.getGlobalBounds().contains(pos.x, pos.y) && objects[1].moving == false)
+					{
+						objects[2].moving = true;
+						objects[2].gravitation = false;
 					}
 				}
 				if (Keyboard::isKeyPressed(Keyboard::Escape)) flagclose = 0;
 				if (event.type == Event::MouseButtonReleased)
 				{
-					if (event.key.code == Mouse::Left)
+					if (event.key.code == Mouse::Left&&objects[1].moving)
 					{
 						objects[1].moving = false;
-						gravitation = true;
+						objects[1].gravitation = true;
+					}
+					if (event.key.code == Mouse::Left && objects[2].moving)
+					{
+						objects[2].moving = false;
+						objects[2].gravitation = true;
 					}
 				}
 				if (event.type == sf::Event::KeyPressed)
 				{
-					if (event.key.code == sf::Keyboard::E && (objects[1].x <= objects[2].x + 45) && (frd == 1)) {
-						shoot.play();
-						if (healthpoint > 0) {
-							healthbar.setSize(Vector2f(100 - max, 20));
-							healthpoint -= 10;
-							max += 10;
-							if (max == 100) {
-								healthbar.setSize(Vector2f(0, 0));
-								objects[2].setScale(0, 0);
-								whitebar.setSize(Vector2f(0, 0));
+					if (event.key.code == sf::Keyboard::E) {
+						if (playerdirection==1&&(objects[2].x >= objects[1].x - 96 - 45))
+						{
+							shoot.play();
+							if (healthpoint > 0) {
+								healthbar.setSize(Vector2f(100 - max, 20));
+								healthpoint -= 10;
+								max += 10;
+								if (max == 100) {
+									healthbar.setSize(Vector2f(0, 0));
+									objects[2].setScale(0, 0);
+									whitebar.setSize(Vector2f(0, 0));
+								}
 							}
 						}
+						else if (playerdirection==2&& (objects[2].x<=objects[1].x+96+45))
+						{
+							shoot.play();
+							if (healthpoint > 0) {
+								healthbar.setSize(Vector2f(100 - max, 20));
+								healthpoint -= 10;
+								max += 10;
+								if (max == 100) {
+									healthbar.setSize(Vector2f(0, 0));
+									objects[2].setScale(0, 0);
+									whitebar.setSize(Vector2f(0, 0));
+								}
+							}
+						}
+						
 					}
-					if (event.key.code == sf::Keyboard::W && onground) {	
+					if (event.key.code == sf::Keyboard::W && onground) {
 						last_frd = 3;
 
 					}
@@ -235,9 +279,23 @@ int main()
 			}
 			if (Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::A)) {
 				frd = 1;
+				playerdirection = 1;
 			}
 			if (Keyboard::isKeyPressed(Keyboard::Right) || Keyboard::isKeyPressed(Keyboard::D)) {
 				frd = 2;
+				playerdirection = 2;
+			}
+			FloatRect playerbounds = objects[1].image.getGlobalBounds();//координаты персонажа
+			FloatRect rectanglebounds = objects[2].image.getGlobalBounds();//координаты стены в виде прямоугольника
+			if (playerbounds.intersects(rectanglebounds)) {
+				if (playerdirection == 1) {
+					objects[1].Move(objects[1].x + 1, objects[1].y);
+					healtpalyer.setPosition(objects[1].x - 24, objects[1].y - 64);
+				}
+				if (playerdirection == 2) {
+					objects[1].Move(objects[1].x - 1, objects[1].y);
+					healtpalyer.setPosition(objects[1].x - 24, objects[1].y - 64);
+				}
 			}
 			if (objects[1].moving) {
 				onground = false;
@@ -246,6 +304,15 @@ int main()
 				objects[1].Move(objects[1].x, objects[1].y);
 				healtpalyer.setPosition(objects[1].x - 24, objects[1].y - 64);
 			}
+			if (objects[2].moving) {
+				onground = false;
+				objects[2].x = pos.x;
+				objects[2].y = pos.y;
+				objects[2].Move(objects[2].x, objects[2].y);
+				healthbar.setPosition(objects[2].x - 50, objects[2].y - 130);
+				whitebar.setPosition(objects[2].x - 50, objects[2].y - 130);
+			}
+			
 
 			update(time, frd, last_frd);
 			window.clear();
