@@ -92,8 +92,7 @@ void update(float time, int& frd, int& last_frd) {
 				objects[1].velocity.y = 0;
 				onground = true;
 				if (playerbounds.intersects(platform)) {
-					cout << "inter" << endl;
-					objects[1].Move(objects[1].x, objects[1].y - 0.5);
+					objects[1].Move(objects[1].x, objects[1].y - 0.125);
 				}
 			}
 			else if (objects[1].y >= window_height - objects[3].height - 42 + 5 && objects[1].x >= objects[7].x - 18) {
@@ -161,7 +160,18 @@ void update(float time, int& frd, int& last_frd) {
 	if (objects[1].x + 22 == objects[7].x && objects[1].y >= 740) {
 		objects[1].Move(objects[1].x - 1, objects[1].y);
 	}
-	
+	if (objects[1].x < objects[1].width / 2) {
+		objects[1].Move(objects[1].x + 1, objects[1].y);
+	}
+	if (objects[1].x > window_width - (objects[1].width / 2)) {
+		objects[1].Move(objects[1].x - 1, objects[1].y);
+	}
+	if (objects[2].x < objects[2].width / 2) {
+		objects[2].Move(objects[2].x + 1, objects[2].y);
+	}
+	if (objects[2].x > window_width - (objects[2].width / 2)) {
+		objects[2].Move(objects[2].x - 1, objects[2].y);
+	}
 }
 
 int main()
@@ -223,6 +233,9 @@ int main()
 				{
 					if (objects[1].image.getGlobalBounds().contains(pos.x, pos.y)&&objects[2].moving==false)
 					{
+						if (((pos.x > (objects[1].x - 25)) && (pos.x < (objects[1].x +25))) && ((pos.y > (objects[1].y - 25)) && (pos.y < (objects[1].y + 25)))) {
+							objects[1].moving = true;
+						}
 						objects[1].moving = true;
 						objects[1].gravitation = false;
 					}
