@@ -170,6 +170,9 @@ void update(float time, int& frd, int& last_frd) {
 	if (objects[2].x < objects[2].width / 2) {
 		objects[2].Move(objects[2].x + 1, objects[2].y);
 	}
+	if (objects[1].y > window_height - objects[1].height / 2) {
+		objects[1].Move(objects[1].x, objects[1].y - 1);
+	}
 	if (objects[2].x > window_width - (objects[2].width / 2)) {
 		objects[2].Move(objects[2].x - 1, objects[2].y);
 	}
