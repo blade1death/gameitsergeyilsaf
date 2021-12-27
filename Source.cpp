@@ -108,15 +108,15 @@ void update(float time, int& frd, int& last_frd) {
 			}
 		}
 	}
-	if (objects[2].gravitation == true){
+	if (objects[2].gravitation == true) {
 		if (objects[2].mass != 0) {
 			if (objects[2].y >= window_height - objects[3].height - objects[2].height / 2 + 10)
 			{
 				objects[2].y = window_height - objects[3].height - objects[2].height / 2 + 10;
 				objects[2].velocity.y = 0;
 				if (rectanglebounds.intersects(platform)) {
-					
-					objects[2].Move(objects[2].x, objects[2].y -0.125);
+
+					objects[2].Move(objects[2].x, objects[2].y - 0.125);
 				}
 
 			}
@@ -160,6 +160,7 @@ void update(float time, int& frd, int& last_frd) {
 	if (objects[1].x + 22 == objects[7].x && objects[1].y >= 740) {
 		objects[1].Move(objects[1].x - 1, objects[1].y);
 	}
+	//границы
 	if (objects[1].x < objects[1].width / 2) {
 		objects[1].Move(objects[1].x + 1, objects[1].y);
 	}
@@ -187,8 +188,7 @@ int main()
 	objects.push_back(background);//оbkects[4] это фон меню
 	objects.push_back(buttonstart);//objects[5] это кнопка старта в меню
 	objects.push_back(buttonexit);//objects[6] это кнопка выхода из игры
-	objects.push_back(platform2);
-
+	objects.push_back(platform2);//objects[7] платформа по которой можно двигаться
 
 	objects[1].mass = 1;
 	objects[2].mass = 1;
@@ -231,9 +231,9 @@ int main()
 			{
 				if (Mouse::isButtonPressed(Mouse::Left))
 				{
-					if (objects[1].image.getGlobalBounds().contains(pos.x, pos.y)&&objects[2].moving==false)
+					if (objects[1].image.getGlobalBounds().contains(pos.x, pos.y) && objects[2].moving == false)
 					{
-						if (((pos.x > (objects[1].x - 25)) && (pos.x < (objects[1].x +25))) && ((pos.y > (objects[1].y - 25)) && (pos.y < (objects[1].y + 25)))) {
+						if (((pos.x > (objects[1].x - 25)) && (pos.x < (objects[1].x + 25))) && ((pos.y > (objects[1].y - 25)) && (pos.y < (objects[1].y + 25)))) {
 							objects[1].moving = true;
 						}
 						objects[1].moving = true;
@@ -248,7 +248,7 @@ int main()
 				if (Keyboard::isKeyPressed(Keyboard::Escape)) flagclose = 0;
 				if (event.type == Event::MouseButtonReleased)
 				{
-					if (event.key.code == Mouse::Left&&objects[1].moving)
+					if (event.key.code == Mouse::Left && objects[1].moving)
 					{
 						objects[1].moving = false;
 						objects[1].gravitation = true;
@@ -261,11 +261,12 @@ int main()
 				}
 				if (event.type == sf::Event::KeyPressed)
 				{
-					if (event.key.code == sf::Keyboard::E) {
-						if (playerdirection==1&& (objects[2].x >= objects[1].x - 96 - 45))
+					if (event.key.code == sf::Keyboard::E) { // attack
+						if (playerdirection == 1 && (objects[2].x >= objects[1].x - 96 - 45))
 						{
-							
-							if (healthpoint > 0) {shoot.play();
+
+							if (healthpoint > 0) {
+								shoot.play();
 								healthbar.setSize(Vector2f(100 - max, 20));
 								healthpoint -= 10;
 								max += 10;
@@ -276,10 +277,11 @@ int main()
 								}
 							}
 						}
-						else if (playerdirection==2&& (objects[2].x<=objects[1].x+96+45))
+						else if (playerdirection == 2 && (objects[2].x <= objects[1].x + 96 + 45))
 						{
-							
-							if (healthpoint > 0) {shoot.play();
+
+							if (healthpoint > 0) {
+								shoot.play();
 								healthbar.setSize(Vector2f(100 - max, 20));
 								healthpoint -= 10;
 								max += 10;
@@ -290,23 +292,24 @@ int main()
 								}
 							}
 						}
-						
+
 					}
-					if (event.key.code == sf::Keyboard::W && onground) {
+					if (event.key.code == sf::Keyboard::W && onground) { // jump
 						last_frd = 3;
 
 					}
 				}
 
 			}
-			if (Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::A)) {
+			if (Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::A)) { // move left
 				frd = 1;
 				playerdirection = 1;
 			}
-			if (Keyboard::isKeyPressed(Keyboard::Right) || Keyboard::isKeyPressed(Keyboard::D)) {
+			if (Keyboard::isKeyPressed(Keyboard::Right) || Keyboard::isKeyPressed(Keyboard::D)) { // move right
 				frd = 2;
 				playerdirection = 2;
 			}
+			// взаимодействие стены с игроком
 			FloatRect playerbounds = objects[1].image.getGlobalBounds();//координаты персонажа
 			FloatRect rectanglebounds = objects[2].image.getGlobalBounds();//координаты стены в виде прямоугольника
 			if (playerbounds.intersects(rectanglebounds)) {
@@ -334,7 +337,7 @@ int main()
 				healthbar.setPosition(objects[2].x - 50, objects[2].y - 130);
 				whitebar.setPosition(objects[2].x - 50, objects[2].y - 130);
 			}
-			
+
 
 			update(time, frd, last_frd);
 			window.clear();
