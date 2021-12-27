@@ -265,9 +265,9 @@ int main()
 				if (event.type == sf::Event::KeyPressed)
 				{
 					if (event.key.code == sf::Keyboard::E) { // attack
-						if (playerdirection == 1 && (objects[2].x >= objects[1].x - 96 - 45))
+						if (playerdirection == 1 && (0 < objects[1].x - objects[2].x) && (objects[1].x - objects[2].x <= 100))
 						{
-
+							cout << objects[1].x - objects[2].x << " ";
 							if (healthpoint > 0) {
 								shoot.play();
 								healthbar.setSize(Vector2f(100 - max, 20));
@@ -280,9 +280,9 @@ int main()
 								}
 							}
 						}
-						else if (playerdirection == 2 && (objects[2].x <= objects[1].x + 96 + 45))
+						else if (playerdirection == 2 && (0 < objects[2].x - objects[1].x) && (objects[2].x - objects[1].x <= 100))
 						{
-
+							cout << objects[2].x - objects[1].x << " ";
 							if (healthpoint > 0) {
 								shoot.play();
 								healthbar.setSize(Vector2f(100 - max, 20));
