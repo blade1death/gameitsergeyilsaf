@@ -56,7 +56,7 @@ public:
 int window_width = 1200;
 int window_height = 800;
 bool onground = false;
-bool gravitation = true;//не могу прыгать если я двигаю персонажа левой кнопкой мыши
+bool gravitation = true;
 int flagclose = 0;
 int frd = 0;
 int last_frd = 0;
@@ -80,32 +80,29 @@ int healthpoint = 100;
 void update(float time, int& frd, int& last_frd) {
 	int g = 10;
 	FloatRect playerbounds = objects[1].image.getGlobalBounds();//координаты персонажа
-	FloatRect rectanglebounds = objects[2].image.getGlobalBounds(); //координаты стены в виде прямоугольника
+	FloatRect rectanglebounds = objects[2].image.getGlobalBounds();//координаты стены в виде прямоугольника
 	FloatRect rectangle2Bounds = objects[7].image.getGlobalBounds();
 	if (gravitation == true) {
 		if (objects[1].mass != 0) {
 			if (objects[1].y >= window_height - objects[3].height - 5)
 			{
 				objects[1].y = window_height - objects[3].height - 5;
-				onground = true;
 				objects[1].velocity.y = 0;
-			}
-			else if (objects[1].y >= window_height - objects[3].height - 42 + 5 && objects[1].x > objects[7].x) 
-			{
-				objects[1].y = window_height - objects[3].height - 42 + 5;
 				onground = true;
-				objects[1].velocity.y = 0;
 			}
-			else 
-			{
+			else if (objects[1].y>= window_height - objects[3].height - 42+5 &&objects[1].x>objects[7].x) {
+				objects[1].y = window_height - objects[3].height - 42+5;
+				objects[1].velocity.y = 0;
+				onground = true;
+			}
+			else {
 				objects[1].velocity.y = objects[1].velocity.y + g * time;
 				objects[1].y = objects[1].y + objects[1].velocity.y * time;
 				objects[1].Move(objects[1].x, objects[1].y);
 				healtpalyer.setPosition(objects[1].x - 24, objects[1].y - 64);
 			}
 		}
-		else
-		{
+		else {
 			objects[1].y = objects[1].y;
 		}
 	}
@@ -121,22 +118,22 @@ void update(float time, int& frd, int& last_frd) {
 		}
 	}
 	if (frd == 2 && objects[1].x < window_width - (objects[1].width / 2)) {
-		player.setImage("bananreverse.png");
-		objects[1].velocity.x = 1;
-		objects[1].x += (objects[1].velocity.x);
-		objects[1].Move(objects[1].x, objects[1].y);
-		healtpalyer.setPosition(objects[1].x - 24, objects[1].y - 64);
-		objects[1].velocity.x = 0;
-		frd = 0;
+			player.setImage("bananreverse.png");
+			objects[1].velocity.x = 1;
+			objects[1].x += (objects[1].velocity.x);
+			objects[1].Move(objects[1].x, objects[1].y);
+			healtpalyer.setPosition(objects[1].x - 24, objects[1].y - 64);
+			objects[1].velocity.x = 0;
+			frd = 0;
 	}
-	if (last_frd == 3 && onground) {
+	if (last_frd == 3) {
 		objects[1].velocity.y = 1;
 		objects[1].y -= 100;
-		healtpalyer.setPosition(objects[1].x - 24, objects[1].y - 64);
+		healtpalyer.setPosition(objects[1].x-24 , objects[1].y - 64);
 		onground = false;
 		last_frd = 0;
 	}
-	if (objects[1].x + 20 == objects[7].x && objects[1].y >= 742) {
+	if (objects[1].x + 20 == objects[7].x&&objects[1].y>=742) {
 		objects[1].Move(objects[1].x - 1, objects[1].y);
 	}
 }
@@ -154,29 +151,30 @@ int main()
 	objects.push_back(background);//оbkects[4] это фон меню
 	objects.push_back(buttonstart);//objects[5] это кнопка старта в меню
 	objects.push_back(buttonexit);//objects[6] это кнопка выхода из игры
-	objects.push_back(platform2);//objects[7] платформа, по которой можно двигаться
+	objects.push_back(platform2);
 
 
 	objects[1].mass = 1;
 
-	objects[0].Move(window_width / 2, sun.height / 2);
 	objects[1].Move(window_width / 2 + objects[1].height * 2, objects[1].height / 2);
 	objects[2].Move(objects[2].width / 2, window_height - objects[3].height * 3);
-	objects[3].Move(window_width / 2, window_height - objects[3].height / 4);	
+	objects[3].Move(window_width / 2, window_height - objects[3].height / 4);
+	objects[0].Move(window_width / 2, sun.height / 2);
 	objects[4].Move(window_width / 2, window_height / 2);
-	objects[5].Move(window_width / 2 - 256, window_height / 2 + 45
-	);
+	objects[5].Move(window_width / 2 - 256, window_height / 2+40);
 	objects[6].Move(window_width / 2 + 256, window_height / 2);
-	objects[7].Move(window_width - 100, window_height - objects[3].height - 10);
+	objects[7].Move(window_width - 100, window_height - objects[3].height-10);
 
 	objects[2].x = objects[2].width;
-	objects[7].y = window_height - objects[3].height - 42 + 14;
-	objects[7].x = window_height - objects[7].width / 2 + 300;
-	//healthbar.setFillColor(Color::Red);
-	//healthbar.setPosition(0, window_height - (objects[2].height + 25));
+	objects[7].y = window_height - objects[3].height - 42+14;
+	objects[7].x = window_height - objects[7].width/2+300;
+
+
+	healthbar.setFillColor(Color::Red);
+	healthbar.setPosition(0, window_height - (objects[2].height + 25));
 
 	healtpalyer.setFillColor(Color::Red);
-	healtpalyer.setPosition(objects[1].x - 48, objects[1].y - 64);
+	healtpalyer.setPosition(objects[1].x-48, objects[1].y - 64);
 
 
 	SoundBuffer shootBuffer;
@@ -212,7 +210,7 @@ int main()
 				}
 				if (event.type == sf::Event::KeyPressed)
 				{
-					if (event.key.code == sf::Keyboard::E && (objects[1].x <= objects[2].x + 45) && (frd == 1)) {
+					if (event.key.code == sf::Keyboard::E && (objects[1].x <= objects[2].x + 45) && (frd==1)) {
 						shoot.play();
 						if (healthpoint > 0) {
 							healthbar.setSize(Vector2f(100 - max, 20));
@@ -224,8 +222,8 @@ int main()
 							}
 						}
 					}
-					if (event.key.code == sf::Keyboard::W) {
-						last_frd = 3;
+					if (event.key.code == sf::Keyboard::W&&onground) {
+							last_frd = 3;
 
 					}
 				}
@@ -238,6 +236,7 @@ int main()
 				frd = 2;
 			}
 			if (objects[1].moving) {
+				onground = false;
 				objects[1].x = pos.x;
 				objects[1].y = pos.y;
 				objects[1].Move(objects[1].x, objects[1].y);
@@ -258,20 +257,16 @@ int main()
 		}
 		else if (flagclose == 0) {
 			while (window.pollEvent(event)) {
-				if (objects[5].image.getGlobalBounds().contains(pos.x, pos.y))
-				{
+				if (objects[5].image.getGlobalBounds().contains(pos.x, pos.y)) {
 					if (Mouse::isButtonPressed(Mouse::Left))
 						flagclose = 1;
-				}
-				if (objects[6].image.getGlobalBounds().contains(pos.x, pos.y) && Mouse::isButtonPressed(Mouse::Left))
-				{
+				}if (objects[6].image.getGlobalBounds().contains(pos.x, pos.y) && Mouse::isButtonPressed(Mouse::Left)) {
 					window.close();
 					break;
 				}
 				if (event.type == sf::Event::KeyPressed)
 				{
-					if (event.key.code == sf::Keyboard::Escape) 
-					{
+					if (event.key.code == sf::Keyboard::Escape) {
 						window.close();
 					}
 				}
