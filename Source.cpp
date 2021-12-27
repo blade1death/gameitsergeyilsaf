@@ -160,9 +160,9 @@ void update(float time, int& frd, int& last_frd) {
 	if (objects[1].x < (objects[1].width / 2)) { objects[1].velocity.x = 0; objects[1].x++; }// не вылетал из окна
 	if (objects[1].moving == true)
 	{
-		if (objects[1].x > window_width-100)//если герой вышел за пределы карты то он выталкивается обратно
+		if (objects[1].x > window_width - 100)//если герой вышел за пределы карты то он выталкивается обратно
 		{
-			objects[1].velocity.x = -100;
+			objects[1].velocity.x = -50;
 		}
 
 		if (objects[1].x < (objects[1].width / 2))
@@ -176,7 +176,7 @@ void update(float time, int& frd, int& last_frd) {
 		}
 		objects[1].x += objects[1].velocity.x * time;
 		objects[1].image.setPosition(objects[1].x, objects[1].y);
-	}//выталкивание объекта обратно в карту после использования мышки
+	}
 	
 }
 
@@ -267,8 +267,8 @@ int main()
 					if (event.key.code == sf::Keyboard::E) {
 						if (playerdirection==1&&(objects[2].x >= objects[1].x - 96 - 45))
 						{
-							shoot.play();
-							if (healthpoint > 0) {
+							
+							if (healthpoint > 0) {shoot.play();
 								healthbar.setSize(Vector2f(100 - max, 20));
 								healthpoint -= 10;
 								max += 10;
@@ -281,8 +281,8 @@ int main()
 						}
 						else if (playerdirection==2&& (objects[2].x<=objects[1].x+96+45))
 						{
-							shoot.play();
-							if (healthpoint > 0) {
+							
+							if (healthpoint > 0) {shoot.play();
 								healthbar.setSize(Vector2f(100 - max, 20));
 								healthpoint -= 10;
 								max += 10;
