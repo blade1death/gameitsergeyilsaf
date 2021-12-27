@@ -111,6 +111,9 @@ void update(float time, int& frd, int& last_frd) {
 			{
 				objects[2].y = window_height - objects[3].height - objects[2].height / 2 + 10;
 				objects[2].velocity.y = 0;
+				if (rectanglebounds.intersects(pol)) {
+					objects[2].Move(objects[2].x, objects[2].y -0.5);
+				}
 
 			}
 			else {
@@ -153,6 +156,28 @@ void update(float time, int& frd, int& last_frd) {
 	if (objects[1].x + 22 == objects[7].x && objects[1].y >= 740) {
 		objects[1].Move(objects[1].x - 1, objects[1].y);
 	}
+	if (objects[1].x > window_width-25) { objects[1].velocity.x = 0; objects[1].x--; }
+	if (objects[1].x < (objects[1].width / 2)) { objects[1].velocity.x = 0; objects[1].x++; }// не вылетал из окна
+	if (objects[1].moving == true)
+	{
+		if (objects[1].x > window_width-100)//если герой вышел за пределы карты то он выталкивается обратно
+		{
+			objects[1].velocity.x = -100;
+		}
+
+		if (objects[1].x < (objects[1].width / 2))
+		{
+			//objects[1].velocity.x = 35;
+		}
+
+		if (objects[1].y > (window_height - objects[1].height))
+		{
+			objects[1].velocity.y = -50;
+		}
+		objects[1].x += objects[1].velocity.x * time;
+		objects[1].image.setPosition(objects[1].x, objects[1].y);
+	}//выталкивание объекта обратно в карту после использования мышки
+	
 }
 
 int main()
